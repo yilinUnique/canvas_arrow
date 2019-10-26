@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <script src="./jquery-3.2.1.min.js"></script>
+    <title>Document</title>
+</head>
+<body>
+    <canvas id="canvasId" width="1920" height="1024" style="border: 1px solid #ccc;"></canvas>
+</body>
+<script>
+    var startX,startY,movingX,movingY,endX,endY;
+    $(document).bind("mousedown", function(event) {
+        startX = event.pageX;
+        startY = event.pageY;
+        console.log(startX+"---start--"+startY);//鼠标按下
+        $(document).bind("mousemove",function(evt){//鼠标移动
+            movingX = evt.pageX;
+            movingY = evt.pageY;
+            console.log(movingX+"---moving--"+movingY);
+        });
+        return false;  
+    });
+    $(document).bind("mouseup",function(e){//鼠标抬起
+        endX = e.pageX;
+        endY = e.pageY;
+        $(document).unbind("mousemove");
+        console.log(endX+"---end--"+endY);
+        drawLineArrow(ctx, startX, startY, endX, endY, "rgba(130, 210, 210, 0.4)");
+        return false;  
+    }); 
+    var canvas = document.getElementById("canvasId");
+    var ctx = canvas.getContext('2d');
+    /**
+     * 绘制带有箭头的直线
+     * @param ctx画布变量
+     * @param fromX/fromY 起点坐标
+     * @param toX/toY 终点坐标
+     * @param color 线与箭头颜色
+     **/
+    function drawLineArrow(ctx, fromX, fromY, toX, toY, color) {
+        var headlen = 50;//自定义箭头线的长度
+        var theta = 30;//自定义箭头线与直线的夹角
+        var arrowX_top, arrowY_top, arrowX_bottom, arrowY_bottom;//箭头线终点坐标
+        // 计算各角度和对应的箭头终点坐标(Math.atan2(y,x)得出的是弧度 再转为角度)
+        var angle;
+        if(fromX == toX && fromY == toY) {
+            angle = 90; //AR页面中在一个点鼠标按下并抬起,呈90°
+        } else {
+            angle = Math.atan2(fromY - toY, fromX - toX) * 180 / Math.PI;
+        }
+        var angle1 = (angle + theta) * Math.PI / 180;
+        var angle2 = (angle - theta) * Math.PI / 180;
+        var topX = headlen * Math.cos(angle1);
+        var topY = headlen * Math.sin(angle1);
+        var botX = headlen * Math.cos(angle2);
+        var botY = headlen * Math.sin(angle2);
+
+        arrowX_top = toX + topX;
+        arrowY_top = toY + topY;
+        arrowX_bottom = toX + botX;
+        arrowY_bottom = toY + botY;
+
+        //中点坐标公式X=(X1+X2)/2  Y=(Y1+Y2)/2
+        //已知点A(arrowX_top,arrowY_top);
+        //已知点B(arrowX_bottom,arrowY_bottom);
+        //设C为中点(middle_x,middle_y)
+        var middle_c_x = (arrowX_top + arrowX_bottom) / 2;
+        var middle_c_y = (arrowY_top + arrowY_bottom) / 2;
+
+        // 设D为A,C中点(middle_d_x,middle_d_y)
+        var middle_d_x = (arrowX_top + middle_c_x) / 2;
+        var middle_d_y = (arrowY_top + middle_c_y) / 2;
+        
+        // 设E为B,C中点(middle_e_x,middle_e_y)
+        var middle_e_x = (arrowX_bottom + middle_c_x) / 2;
+        var middle_e_y = (arrowY_bottom + middle_c_y) / 2;
+
+        //以起始点为圆心 画半径为5的实心圆
+        ctx.beginPath();
+        ctx.arc(fromX, fromY, 5, 0, 2*Math.PI);
+        ctx.strokeStyle = "rgb(130, 210, 210)";
+        ctx.stroke();
+        ctx.fillStyle = "rgb(130, 210, 210)";
+        ctx.fill();
+
+        //虚线(中间那条长线)
+        ctx.beginPath();
+        ctx.setLineDash([15, 5]);//虚线
+        //画虚直线(画到了三角形和虚线交点处，不是画到头的)
+        ctx.moveTo(fromX, fromY);
+        ctx.lineTo(middle_c_x, middle_c_y);
+        ctx.strokeStyle = "rgb(130, 210, 210)";
+        ctx.stroke();
+
+        //实线(所有边线)
+        ctx.beginPath();
+        ctx.setLineDash([]);//实线
+        //画上边箭头线
+        ctx.moveTo(toX, toY);
+        ctx.lineTo(arrowX_top, arrowY_top);//上箭头坐标
+        ctx.lineTo(middle_d_x, middle_d_y);//上箭头中间点坐标
+        ctx.lineTo(fromX, fromY);
+        //画下边箭头线
+        ctx.lineTo(middle_e_x, middle_e_y);//下箭头中间点坐标
+        ctx.lineTo(arrowX_bottom, arrowY_bottom);//下箭头坐标
+        ctx.lineTo(toX, toY);
+        ctx.strokeStyle = "rgb(130, 210, 210)";
+        ctx.stroke();
+
+        ctx.fillStyle = color;
+        ctx.fill();
+    }
+</script>
+</html>
