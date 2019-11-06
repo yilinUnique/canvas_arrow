@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <script src="./jquery-3.2.1.min.js"></script>
+  </head>
+  <body>
+    <canvas
+      id="myCanvas"
+      width="1920"
+      height="1024"
+      style="border: 1px solid #ccc;"
+    ></canvas>
+    <script>
+      var startX, startY, movingX, movingY, endX, endY;
+      $(document).bind("mousedown", function(event) {
+        startX = event.pageX;
+        startY = event.pageY;
+        console.log(startX + "---start--" + startY); //鼠标按下
+        $(document).bind("mousemove", function(evt) {
+          //鼠标移动
+          movingX = evt.pageX;
+          movingY = evt.pageY;
+          console.log(movingX + "---moving--" + movingY);
+        });
+        return false;
+      });
+      $(document).bind("mouseup", function(e) {
+        //鼠标抬起
+        endX = e.pageX;
+        endY = e.pageY;
+        $(document).unbind("mousemove");
+        console.log(endX + "---end--" + endY);
+        drawLineArrow(
+          ctx,
+          startX,
+          startY,
+          endX,
+          endY,
+          "rgba(130, 210, 210, 0.4)"
+        );
+        return false;
+      });
+
+      var c = document.getElementById("myCanvas");
+      var ctx = c.getContext("2d");
+
+      function drawLineArrow(ctx, fromX, fromY, toX, toY, color) {
+        ctx.beginPath();
+        ctx.moveTo(fromX, fromY);
+        ctx.quadraticCurveTo((toX + fromX) / 2, toY, toX, toY);
+        // ctx.quadraticCurveTo(350,500,800,50);
+
+        //ctx.moveTo(800,50);
+        //ctx.quadraticCurveTo(350,50,100,500);
+        //ctx.quadraticCurveTo(350,500,100,500);
+        ctx.stroke();
+
+        // var theta = 30,
+        //   headlen = 50,
+        //   width = 2;
+        // // 计算各角度和对应的P2,P3坐标
+        // var angle = (Math.atan2(fromY - toY, fromX - toX) * 180) / Math.PI,
+        //   angle1 = ((angle + theta) * Math.PI) / 180,
+        //   angle2 = ((angle - theta) * Math.PI) / 180,
+        //   topX = headlen * Math.cos(angle1),
+        //   topY = headlen * Math.sin(angle1),
+        //   botX = headlen * Math.cos(angle2),
+        //   botY = headlen * Math.sin(angle2);
+
+        // ctx.save();
+        // ctx.beginPath();
+
+        // var arrowX = fromX - topX,
+        //   arrowY = fromY - topY;
+
+        // arrowX = toX + topX;
+        // arrowY = toY + topY;
+        // ctx.moveTo(arrowX, arrowY);
+        // ctx.lineTo(toX, toY);
+        // arrowX = toX + botX;
+        // arrowY = toY + botY;
+        // ctx.lineTo(arrowX, arrowY);
+        // ctx.strokeStyle = color;
+        // ctx.lineWidth = width;
+        // ctx.stroke();
+        // ctx.restore();
+        // ctx.fillStyle = color;
+        // ctx.fill();
+      }
+    </script>
+  </body>
+</html>
